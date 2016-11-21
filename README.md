@@ -2,7 +2,7 @@
 
 A simple demo showing how to generate an OpenGL type push / pop matrix stack.
 
-This simple stack has a default depth of 40 with push and pop operations.
+This demo uses a template for the stack so it can be used with different types and sizes
 
 The stack contains 2 matrices we can access for shading, MVP which is the combinations of the current top of stack model transform, the View matrix and the projection matrix. This is usually loaded to the shader for the converting the vertices.
 
