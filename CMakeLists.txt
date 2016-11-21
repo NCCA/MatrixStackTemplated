@@ -9,7 +9,9 @@ include_directories(include $ENV{HOME}/NGL/include)
 set(SOURCES ${PROJECT_SOURCE_DIR}/src/main.cpp  
 			${PROJECT_SOURCE_DIR}/src/NGLScene.cpp  
 			${PROJECT_SOURCE_DIR}/src/MatrixStack.cpp  
+			${PROJECT_SOURCE_DIR}/src/NGLSceneMouseControls.cpp
 			${PROJECT_SOURCE_DIR}/include/NGLScene.h  
+			${PROJECT_SOURCE_DIR}/include/WindowParams.h  
 			${PROJECT_SOURCE_DIR}/include/MatrixStack.h  
 )
 # use C++ 11

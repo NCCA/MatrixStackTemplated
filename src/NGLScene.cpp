@@ -80,8 +80,8 @@ void NGLScene::loadMatricesToShader()
   ngl::Mat3 normalMatrix;
   normalMatrix=m_stack.MV();
   normalMatrix.inverse();
-  shader->setShaderParamFromMat4("MVP",m_stack.MVP());
-  shader->setShaderParamFromMat3("normalMatrix",normalMatrix);
+  shader->setUniform("MVP",m_stack.MVP());
+  shader->setUniform("normalMatrix",normalMatrix);
  }
 
 void NGLScene::paintGL()
@@ -153,6 +153,7 @@ void NGLScene::paintGL()
     m_stack.pushMatrix();
       m_stack.translate(0.0,-1.2f,0.0);
       loadMatricesToShader();
+      shader->setShaderParam4f("Colour",0,0,0,1);
       prim->draw("grid");
    m_stack.popMatrix();
   m_stack.popMatrix();

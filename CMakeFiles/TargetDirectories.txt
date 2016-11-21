@@ -1,2 +1,0 @@
-/Users/jmacey/NGL6Demos/MatrixStack/CMakeFiles/MatrixStack.dir
-/Users/jmacey/NGL6Demos/MatrixStack/CMakeFiles/MatrixStack_automoc.dir

@@ -1,4 +1,4 @@
-# Install script for directory: /Users/jmacey/NGL6Demos/MatrixStack
+# Install script for directory: /Users/jmacey/NGL6Demos/MatrixStackTemplated
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -35,5 +35,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/Users/jmacey/NGL6Demos/MatrixStack/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/Users/jmacey/NGL6Demos/MatrixStackTemplated/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

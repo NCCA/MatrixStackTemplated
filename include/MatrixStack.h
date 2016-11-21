@@ -1,13 +1,16 @@
 #ifndef MATRIXSTACK_H_
 #define MATRIXSTACK_H_
+#include <ngl/Mat3.h>
 #include <ngl/Mat4.h>
+#include <iostream>
+#include <ngl/NGLStream.h>
+
 #include <array>
 //----------------------------------------------------------------------------------------------------------------------
 /// @brief Simple Matrix Stack for Old school OpenGL
 /// transformations in a modern GL context
 //----------------------------------------------------------------------------------------------------------------------
-constexpr size_t s_stackSize=40;
-
+template<typename T, std::size_t stackSize >
 class MatrixStack
 {
   public :
@@ -15,17 +18,37 @@ class MatrixStack
     /// @brief ctor can set depth
     /// @param _depth stack size default 40
     //----------------------------------------------------------------------------------------------------------------------
-    MatrixStack() {}
+    MatrixStack()=default;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief push the current value of top onto
     /// the stack
     //----------------------------------------------------------------------------------------------------------------------
-    void pushMatrix();
+    void pushMatrix()
+    {
+      if(++m_top< m_depth)
+      {
+        // copy the matrix to the top of stack
+        m_stack[m_top]=m_stack[m_top-1];
+      }
+      else
+      {
+        std::cerr<<"Matrix stack overflow\n";
+        exit(EXIT_FAILURE);
+      }
+    }
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief pop the current top of stack and replace
     /// with last
     //----------------------------------------------------------------------------------------------------------------------
-    void popMatrix();
+    void popMatrix()
+    {
+      m_stack[m_top].identity();
+      if(--m_top<0 )
+      {
+        std::cerr<<"Matrix stack underflow \n";
+        exit(EXIT_FAILURE);
+      }
+    }
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief similar to glIdentity() will reset top of stack (but not view)
     //----------------------------------------------------------------------------------------------------------------------
@@ -57,7 +80,15 @@ class MatrixStack
     /// @note this is done as follows
     ///  ngl::Mat4 final=z*y*x; where each is a rotation matrix
     //----------------------------------------------------------------------------------------------------------------------
-    void rotate(float _x, float _y, float _z);
+    void rotate(float _x, float _y, float _z)
+    {
+      ngl::Mat4 x,y,z;
+      x.rotateX(_x);
+      y.rotateY(_y);
+      z.rotateZ(_z);
+      ngl::Mat4 final=z*y*x;
+      m_stack[m_top]*=final;
+    }
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief axis angle rotation like glRotate
     /// @param _angle the angle of rotation in degrees
@@ -67,47 +98,62 @@ class MatrixStack
     /// @note this works like glRotate so we could do
     /// rotate(45,0,1,0) to rotate 45 degrees in the Y
     //----------------------------------------------------------------------------------------------------------------------
-    void rotate(float _angle,float _x, float _y, float _z);
+    void rotate(float _angle,float _x, float _y, float _z)
+    {
+      ngl::Mat4 r;
+      r.euler(_angle,_x,_y,_z);
+      m_stack[m_top]*=r;
+    }
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief translate similar to glTranslate
     /// @param _x the x translation
     /// @param _y the x translation
     /// @param _z the x translation
     //----------------------------------------------------------------------------------------------------------------------
-    void translate(float _x, float _y, float _z);
+    void translate(float _x, float _y, float _z)
+    {
+      ngl::Mat4 t;
+      t.translate(_x,_y,_z);
+      m_stack[m_top]*=t;
+    }
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief scale similar to glScale a uniform scale around the origin
     /// @param _x the x scale
     /// @param _y the x scale
     /// @param _z the x scale
     //----------------------------------------------------------------------------------------------------------------------
-    void scale(float _x, float _y, float _z);
+    void scale(float _x, float _y, float _z)
+    {
+      ngl::Mat4 s;
+      s.scale(_x,_y,_z);
+      m_stack[m_top]*=s;
+    }
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief get the Model View Project matrix
     /// @returns the MVP matrix product
     //----------------------------------------------------------------------------------------------------------------------
-    ngl::Mat4 MVP()const
+    T MVP()const
     { return m_stack[m_top]*m_view*m_projection; }
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief get the Model View  matrix
     /// @returns the MV matrix product
     //----------------------------------------------------------------------------------------------------------------------
-    ngl::Mat4 MV()const
+    T MV()const
     { return m_stack[m_top]*m_view; }
 
 private :
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief make this non-copyable
     //----------------------------------------------------------------------------------------------------------------------
-    MatrixStack(const MatrixStack &){}
+    MatrixStack(const MatrixStack &)=delete;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief make this non-copyable
     //----------------------------------------------------------------------------------------------------------------------
-    MatrixStack operator=(const MatrixStack &){return *this;}
+    MatrixStack operator=(const MatrixStack &)=delete;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief the actual stack
     //----------------------------------------------------------------------------------------------------------------------
-    std::array<ngl::Mat4,s_stackSize> m_stack;
+    std::array<T,stackSize> m_stack;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief the top of the stack
     //----------------------------------------------------------------------------------------------------------------------
@@ -115,15 +161,15 @@ private :
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief the depth of the stack
     //----------------------------------------------------------------------------------------------------------------------
-    size_t m_depth=s_stackSize;
+    size_t m_depth=stackSize;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief view matrix
     //----------------------------------------------------------------------------------------------------------------------
-    ngl::Mat4 m_view;
+    T m_view;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief projection matrix
     //----------------------------------------------------------------------------------------------------------------------
-    ngl::Mat4 m_projection;
+    T m_projection;
 };
 
 #endif
