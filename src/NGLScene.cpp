@@ -50,9 +50,9 @@ void NGLScene::initializeGL()
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   (*shader)["nglDiffuseShader"]->use();
 
-  shader->setShaderParam4f("Colour",1,1,1,1);
-  shader->setShaderParam3f("lightPos",1,1,1);
-  shader->setShaderParam4f("lightDiffuse",1,1,1,1);
+  shader->setUniform("Colour",1.0f,1.0f,1.0f,1.0f);
+  shader->setUniform("lightPos",1.0f,1.0f,1.0f);
+  shader->setUniform("lightDiffuse",1.0f,1.0f,1.0f,1.0f);
 
   ngl::Vec3 from(0,2,2);
   ngl::Vec3 to(0,0,0);
@@ -79,7 +79,7 @@ void NGLScene::loadMatricesToShader()
   ngl::Mat4 MVP;
   ngl::Mat3 normalMatrix;
   normalMatrix=m_stack.MV();
-  normalMatrix.inverse();
+  normalMatrix.inverse().transpose();
   shader->setUniform("MVP",m_stack.MVP());
   shader->setUniform("normalMatrix",normalMatrix);
  }
@@ -92,7 +92,7 @@ void NGLScene::paintGL()
   // grab an instance of the shader manager
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   (*shader)["nglDiffuseShader"]->use();
-  shader->setShaderParam4f("Colour",1,1,1,1);
+  shader->setUniform("Colour",1.0f,1.0f,1.0f,1.0f);
 
 
   // Rotation based on the mouse position for our global transform
@@ -132,7 +132,7 @@ void NGLScene::paintGL()
         float x=cos(i)*2.0f;
         float z=sin(i)*2.0f;
         float y=sin(i*m_freq)*0.5f;
-        shader->setShaderParam4f("Colour",x,y,z,1);
+        shader->setUniform("Colour",x,y,z,1.0f);
 
         m_stack.rotate(m_rot,0,1,0);
         m_stack.translate(x,y,z);
@@ -153,7 +153,7 @@ void NGLScene::paintGL()
     m_stack.pushMatrix();
       m_stack.translate(0.0,-1.2f,0.0);
       loadMatricesToShader();
-      shader->setShaderParam4f("Colour",0,0,0,1);
+      shader->setUniform("Colour",0.0f,0.0f,0.0f,1.0f);
       prim->draw("grid");
    m_stack.popMatrix();
   m_stack.popMatrix();
