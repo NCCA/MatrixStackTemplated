@@ -2,7 +2,6 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
 #include <ngl/Transformation.h>
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
@@ -54,7 +53,7 @@ void NGLScene::initializeGL()
   shader->setUniform("lightPos",1.0f,1.0f,1.0f);
   shader->setUniform("lightDiffuse",1.0f,1.0f,1.0f,1.0f);
 
-  ngl::Vec3 from(0,2,2);
+  ngl::Vec3 from(0,2,5);
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
   int w=this->size().width();
@@ -62,7 +61,7 @@ void NGLScene::initializeGL()
   // set the view matrix for the stack
   m_stack.setView(ngl::lookAt(from,to,up));
   // set the projection for the stack
-  m_stack.setProjection( ngl::perspective(45,(float)w/h,0.05,350));
+  m_stack.setProjection( ngl::perspective(45.0f,static_cast<float>(w)/h,0.05f,350.0f));
   // as re-size is not explicitly called we need to do this.
   glViewport(0,0,width(),height());
   ngl::VAOPrimitives::instance()->createLineGrid("grid",10,10,100);
@@ -126,28 +125,26 @@ void NGLScene::paintGL()
     m_stack.popMatrix();
 
 
-    for(float i=0; i<2*M_PI; i+=0.01)
+    for(float i=0.0f; i<2.0f*static_cast<float>(M_PI); i+=0.01f)
     {
       m_stack.pushMatrix();
-        float x=cos(i)*2.0f;
-        float z=sin(i)*2.0f;
-        float y=sin(i*m_freq)*0.5f;
-        shader->setUniform("Colour",x,y,z,1.0f);
+      float x=cos(i)*2.0f;
+      float z=sin(i)*2.0f;
+      float y=sin(i*m_freq)*0.5f;
+      shader->setUniform("Colour",x,y,z,1.0f);
 
-        m_stack.rotate(m_rot,0,1,0);
-        m_stack.translate(x,y,z);
-        m_stack.pushMatrix();
-          m_stack.scale(0.04f,0.04f,0.04f);
-          if(i>180)
-            m_stack.rotate(m_rot*2,0,0,1);
-          else
-            m_stack.rotate(m_rot*2,0,1,0);
-
-
-          loadMatricesToShader();
-          prim->draw("sphere");
-        m_stack.popMatrix();
+      m_stack.rotate(m_rot,0,1,0);
+      m_stack.translate(x,y,z);
+      m_stack.pushMatrix();
+        m_stack.scale(0.04f,0.04f,0.04f);
+        if(i>180)
+          m_stack.rotate(m_rot*2,0,0,1);
+        else
+          m_stack.rotate(m_rot*2,0,1,0);
+        loadMatricesToShader();
+        prim->draw("sphere");
       m_stack.popMatrix();
+    m_stack.popMatrix();
     }
 
     m_stack.pushMatrix();
